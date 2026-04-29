@@ -10,9 +10,6 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 db = SQLAlchemy(app)
 
-
 @app.route("/")
 def home():
-    return render_template("dashboard.html")
-
-app.run(debug=True)
+    return render_template("login.html")
