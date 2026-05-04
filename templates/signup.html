@@ -4,6 +4,9 @@
 
 {% block main %}
 <div class="mt-4">
+    {% if errors %}
+    <p> errors detected </p>
+    {% endif %}
     <h2 class="mb-1">Create Account</h2>
     <p class="text-muted mb-4">Start tracking your chronic pain patterns.</p>
 

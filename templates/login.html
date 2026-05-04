@@ -3,7 +3,12 @@
 {% block title %}Sign In{% endblock %}
 
 {% block main %}
+
 <div class="mt-4">
+    {% if errors %}
+        <p>Errors detected</p>
+    {% endif %}
+    
     <h2 class="mb-1">Welcome Back</h2>
     <p class="text-muted mb-4">Sign in to continue tracking your pain.</p>
 
@@ -12,9 +17,9 @@
         <div class="mb-3">
             <label for="email" class="form-label">Username or Email</label>
             <input 
-                type="email" 
+                type="text" 
                 class="form-control form-control-lg" 
-                id="email" 
+                id="username" 
                 name="username" 
                 required>
         </div>
