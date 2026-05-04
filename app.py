@@ -76,7 +76,7 @@ def login():
             user = User.query.filter_by(username=username).first()
 
             # check if user exists, if not 
-            if user is None or not check_password_hash(user["hash"], password):
+            if not user or not check_password_hash(user.password_hash, password):
                 errors["wrong_info"] = True
                 return render_template("login.html", errors={"": True})
             else:
