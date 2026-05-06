@@ -4,11 +4,14 @@
     Dashboard
 {% endblock %}
 
-{% block signout %}
-<a class="d-block mb-3" href="/logout">Logout</a>
-{% endblock %}
 
 {% block main %}
-    <h1>Register page is working</h1>
-    <p>test</p>
+    <form method="POST" action="/log">
+    <label for="pain_level">Pain level</label>
+    <input type="range" min="1" max="10" name="pain_level" id="pain_level">
+
+    <textarea name="pain_notes" class="form-control mt-3" placeholder="Notes"></textarea>
+
+    <button class="btn btn-primary w-100 mt-3">Save Pain Log</button>
+</form>
 {% endblock %}

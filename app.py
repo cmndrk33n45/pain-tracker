@@ -4,6 +4,7 @@ from flask import Flask, render_template, session, g, request, redirect, url_for
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
+from models import db, User, PainLog
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -15,20 +16,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-db = SQLAlchemy(app)
-
-# helper functions:
-
-# create SQL classes
-# user
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    name = db.Column(db.String(100))
-    password_hash = db.Column(db.String(255), nullable=False)
-    reset_token = db.Column(db.String(255))
-    username = db.Column(db.String(80), unique=True, nullable=False)
+db.init_app(app)
 
 # create / enable rows
 with app.app_context():
