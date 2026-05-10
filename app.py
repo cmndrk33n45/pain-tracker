@@ -38,7 +38,17 @@ def login_required(f):
 def home():
     user = User.query.get(session["user_id"])
     return render_template("dashboard.html", user=user)
+    
 
+app.route("/log_pain", methods=["GET", "POST"])
+@login_required
+def log_pain():
+    if request.method == "POST":
+        return redirect("/")
+    else:
+        user = User.query.get(session["user_id"])
+        return render_template("log+_pain.html", user=user)
+    
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -70,7 +80,6 @@ def login():
             else:
                 session["user_id"] = user.id
                 return redirect("/")
-
     else:
         return render_template("login.html", errors=errors)
 

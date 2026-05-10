@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+
+{% block main %}
+    <form method="POST" action="/log_pain">
+        <div class="mb-3">
+            <label for="pain_level" class="form-label">Current Pain Level</label>
+            <div class="d-flex justify-content-between small text-muted">
+                <span>Low</span>
+                <span>High</span>
+            </div>
+            <input type="range" min="1" max="10" class="form-range"name="pain_level" id="pain_level">
+        </div>
+        <div class="mb-3">
+            <label for="pain_notes" class="form-label">Notes</label>
+            <textarea name="pain_notes" class="form-control" placeholder=""></textarea>
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary w-100 mt-3">Log Pain</button>
+        </div>
+    </form>
+{% endblock %}
