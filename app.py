@@ -40,14 +40,35 @@ def home():
     return render_template("dashboard.html", user=user)
     
 
-app.route("/log_pain", methods=["GET", "POST"])
+@app.route("/log_pain", methods=["GET", "POST"])
 @login_required
 def log_pain():
+
+    user = User.query.get(session["user_id"])
+    errors = {}
+
     if request.method == "POST":
-        return redirect("/")
+        pain_level = request.form.get("pain_level")
+        pain_notes = request.form.get("pain_level")
+
+        #check if pain level was filled, notes can remain blank
+        if not pain_level:
+            errors["pain_level"] = True
+            return render_template("log_pain.html", user=user, errors=errors)
+        else:
+            #log to db
+            pain_log = PainLog(
+                user_id=user.id,
+                pain_level=pain_level,
+                pain_notes=pain_notes
+            )
+
+            db.session.add(pain_log)
+            db.session.commit()
+
+            return redirect("/")
     else:
-        user = User.query.get(session["user_id"])
-        return render_template("log+_pain.html", user=user)
+        return render_template("log_pain.html", user=user, errors=errors)
     
 
 @app.route("/login", methods=["GET", "POST"])
