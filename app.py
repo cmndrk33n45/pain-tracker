@@ -104,6 +104,17 @@ def login():
     else:
         return render_template("login.html", errors=errors)
 
+@app.route("/pain_log", methods=["GET"])
+def pain_log():
+
+    user = User.query.get(session["user_id"])
+    pain = PainLog.query.filter_by(user_id=user.id).all()
+
+    print("it works at all", flush=True)
+    print(user)
+    print(pain)
+
+    return render_template("/pain_log.html", pain=pain)
 
 @app.route("/logout")
 def logout():

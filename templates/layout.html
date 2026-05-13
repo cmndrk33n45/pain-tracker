@@ -21,7 +21,7 @@
         <button class="btn border-0 me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#appMenu">
             <i class="bi bi-list icon-hamburger"></i>
         </button>
-        <h5 class="mb-0">Pain Tracker</h5>
+        <h5 class="mb-0"><a href="/">Pain Tracker</a></h5>
     </header>
 
    
@@ -34,6 +34,7 @@
         <div class="offcanvas-body">
             {% if session.get("user_id") %}
             <a class="d-block mb-3" href="/profile">Profile</a>
+            <a class="d-block mb-3" href="/pain_log">Pain Log</a>
             <a class="d-block mb-3" href="/settings">Settings</a>
             <a class="d-block mb-3" href="/report">Export Report</a>
             <a class="d-block mb-3" href="/privacy">Privacy</a>

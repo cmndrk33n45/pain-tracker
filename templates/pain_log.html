@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}Pain Log{% endblock %}
+
+{% block main %}
+    <table class="table">
+        <tr>
+            <th>Pain Level</th>
+            <th>Date</th>
+        </tr>
+        {% for log in pain %}
+        <tr>
+            <td>{{ log.pain_level }}</td>
+            <td>{{ log.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
