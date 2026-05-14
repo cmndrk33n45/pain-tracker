@@ -103,6 +103,18 @@ def login():
                 return redirect("/")
     else:
         return render_template("login.html", errors=errors)
+    
+
+@app.route("/logout")
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
+
 
 @app.route("/pain_log", methods=["GET"])
 def pain_log():
@@ -116,14 +128,14 @@ def pain_log():
 
     return render_template("/pain_log.html", pain=pain)
 
-@app.route("/logout")
-def logout():
-    """Log user out"""
 
-    # Forget any user_id
-    session.clear()
+@app.route("/report", methods=["GET", "POST"])
+def report():
+    return redirect("/")
 
-    # Redirect user to login form
+
+@app.route("/settings", methods=["GET", "POST"])
+def settings():
     return redirect("/")
 
 
