@@ -122,11 +122,22 @@ def pain_log():
     user = User.query.get(session["user_id"])
     pain = PainLog.query.filter_by(user_id=user.id).all()
 
-    print("it works at all", flush=True)
-    print(user)
-    print(pain)
+    labels = [
+        log.created_at.strftime("%Y-%m-%d")
+        for log in pain
+    ]
 
-    return render_template("/pain_log.html", pain=pain)
+    pain_levels = [
+        log.pain_level
+        for log in pain
+    ]
+
+    return render_template(
+        "pain_log.html",
+        pain=pain,
+        labels=labels,
+        pain_levels=pain_levels
+    )
 
 
 @app.route("/report", methods=["GET", "POST"])

@@ -3,6 +3,8 @@
 {% block title %}Pain Log{% endblock %}
 
 {% block main %}
+    <canvas id="pain_log_graph"></canvas>
+
     <table class="table">
         <tr>
             <th>Pain Level</th>
@@ -15,4 +17,31 @@
         </tr>
         {% endfor %}
     </table>
+
+    <script>
+        let label_info = {{ labels | tojson }};
+        let painLevels = {{ pain_levels | tojson }};
+
+        let ctx = document.getElementById('pain_log_graph');
+
+        let lineGraph = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: label_info,
+                datasets: [{
+                    label: "Pain Level",
+                    data: painLevels
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 10
+                    }
+                }
+            }
+        });
+    </script>
 {% endblock %}
