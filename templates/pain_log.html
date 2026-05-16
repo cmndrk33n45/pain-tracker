@@ -3,14 +3,39 @@
 {% block title %}Pain Log{% endblock %}
 
 {% block main %}
-    <canvas id="pain_log_graph"></canvas>
+    <h2>Pain Logs for {{title}}</h2>
+
+    <form method="GET" action="/pain_log" class="mb-3">
+        <label for="range" class="form-label">View</label>
+
+        <select 
+            id="range" 
+            name="range" 
+            class="form-select"
+            onchange="this.form.submit()">
+
+            <option value="month" {% if selected_range == "month" %}selected{% endif %}>
+                This Month
+            </option>
+
+            <option value="year" {% if selected_range == "year" %}selected{% endif %}>
+                This Year
+            </option>
+
+            <option value="all" {% if selected_range == "all" %}selected{% endif %}>
+                All Time
+            </option>
+        </select>
+    </form>
+
+    <canvas class ="mb-3" id="pain_log_graph"></canvas>
 
     <table class="table">
         <tr>
             <th>Pain Level</th>
             <th>Date</th>
         </tr>
-        {% for log in pain %}
+        {% for log in pain | reverse %}
         <tr>
             <td>{{ log.pain_level }}</td>
             <td>{{ log.created_at }}</td>

@@ -1,5 +1,6 @@
 # test code for first run
 import os #maybe not needed?
+from datetime import date, datetime
 from flask import Flask, render_template, session, g, request, redirect, url_for
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
@@ -117,26 +118,43 @@ def logout():
 
 
 @app.route("/pain_log", methods=["GET"])
+@login_required
 def pain_log():
-
     user = User.query.get(session["user_id"])
-    pain = PainLog.query.filter_by(user_id=user.id).all()
 
-    labels = [
-        log.created_at.strftime("%Y-%m-%d")
-        for log in pain
-    ]
+    selected_range = request.args.get("range", "month")
 
-    pain_levels = [
-        log.pain_level
-        for log in pain
-    ]
+    query = PainLog.query.filter_by(user_id=user.id)
+
+    title = "All Time"
+
+    today = date.today()
+
+    if selected_range == "month":
+        title = today.strftime("%B")
+        query = query.filter(
+            db.extract("year", PainLog.created_at) == today.year,
+            db.extract("month", PainLog.created_at) == today.month
+        )
+
+    elif selected_range == "year":
+        title = str(today.year)
+        query = query.filter(
+            db.extract("year", PainLog.created_at) == today.year
+        )
+
+    pain = query.order_by(PainLog.created_at.asc()).all()
+
+    labels = [log.created_at.strftime("%Y-%m-%d") for log in pain]
+    pain_levels = [log.pain_level for log in pain]
 
     return render_template(
         "pain_log.html",
         pain=pain,
         labels=labels,
-        pain_levels=pain_levels
+        pain_levels=pain_levels,
+        selected_range=selected_range,
+        title=title
     )
 
 
