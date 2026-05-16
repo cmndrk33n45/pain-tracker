@@ -44,32 +44,42 @@ def home():
 @app.route("/log_pain", methods=["GET", "POST"])
 @login_required
 def log_pain():
-
     user = User.query.get(session["user_id"])
     errors = {}
 
     if request.method == "POST":
         pain_level = request.form.get("pain_level")
-        pain_notes = request.form.get("pain_level")
+        pain_notes = request.form.get("pain_notes")
 
-        #check if pain level was filled, notes can remain blank
         if not pain_level:
             errors["pain_level"] = True
             return render_template("log_pain.html", user=user, errors=errors)
+
+        pain_level = int(pain_level)
+        today = date.today()
+
+        existing_log = PainLog.query.filter(
+            PainLog.user_id == user.id,
+            db.extract("year", PainLog.created_at) == today.year,
+            db.extract("month", PainLog.created_at) == today.month,
+            db.extract("day", PainLog.created_at) == today.day
+        ).first()
+
+        if existing_log:
+            existing_log.pain_level = pain_level
+            existing_log.pain_notes = pain_notes
         else:
-            #log to db
             pain_log = PainLog(
                 user_id=user.id,
                 pain_level=pain_level,
                 pain_notes=pain_notes
             )
-
             db.session.add(pain_log)
-            db.session.commit()
 
-            return redirect("/")
-    else:
-        return render_template("log_pain.html", user=user, errors=errors)
+        db.session.commit()
+        return redirect("/")
+
+    return render_template("log_pain.html", user=user, errors=errors)
     
 
 @app.route("/login", methods=["GET", "POST"])
@@ -121,16 +131,19 @@ def logout():
 @login_required
 def pain_log():
     user = User.query.get(session["user_id"])
-
     selected_range = request.args.get("range", "month")
-
     query = PainLog.query.filter_by(user_id=user.id)
-
+    pain = query.order_by(PainLog.created_at.asc()).all()
+    labels = [log.created_at.strftime("%Y-%m-%d") for log in pain]
     title = "All Time"
 
     today = date.today()
 
     if selected_range == "month":
+        labels = [
+            log.created_at.strftime("%d")
+            for log in pain
+        ]   
         title = today.strftime("%B")
         query = query.filter(
             db.extract("year", PainLog.created_at) == today.year,
@@ -138,14 +151,16 @@ def pain_log():
         )
 
     elif selected_range == "year":
+        labels = [
+            log.created_at.strftime("%b")
+            for log in pain
+        ]
         title = str(today.year)
         query = query.filter(
             db.extract("year", PainLog.created_at) == today.year
         )
 
-    pain = query.order_by(PainLog.created_at.asc()).all()
 
-    labels = [log.created_at.strftime("%Y-%m-%d") for log in pain]
     pain_levels = [log.pain_level for log in pain]
 
     return render_template(
