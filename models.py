@@ -3,7 +3,6 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-# user
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +14,6 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
 
 
-# painlog
 class PainLog(db.Model):
     __tablename__ = "pain_logs"
     id = db.Column(db.Integer, primary_key=True)
@@ -25,3 +23,10 @@ class PainLog(db.Model):
     body_view = db.Column(db.String(10))  # "front" or "back"
     body_areas = db.Column(db.Text)  # JSON string for now
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class Reminders(db.Model):
+    user_id = db.Column(db.Integer, nullable=False)
+    checkin_last = db.Column(db.DateTime)
+    checkin_weekly = db.Column(db.DateTime)
+    checkin_monthyl = db.Column(db.DateTime)
+    checkin_yearly = db.Column(db.DateTime)
