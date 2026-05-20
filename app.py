@@ -5,7 +5,7 @@ from flask import Flask, render_template, session, g, request, redirect, url_for
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
-from models import db, User, PainLog
+from models import db, User, PainLog, Reminder
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -27,8 +27,19 @@ with app.app_context():
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get("user_id") is None:
+        user_id = session.get("user_id")
+
+        if user_id is None:
             return redirect("/login")
+
+        user = User.query.get(user_id)
+
+        if user is None:
+            session.clear()
+            return redirect("/login")
+
+        g.user = user
+
         return f(*args, **kwargs)
 
     return decorated_function
@@ -37,26 +48,48 @@ def login_required(f):
 @app.route("/")
 @login_required
 def home():
-    user = User.query.get(session["user_id"])
-    return render_template("dashboard.html", user=user)
+    user = g.user
+    reminder = Reminder.query.filter(Reminder.user_id == user.id).first()
+    today = date.today()
+
+    # if there is no reminder or the user has not checked in today, take user to log pain
+    if not reminder or reminder.checkin_last != today:
+        return render_template("log_pain.html")
+    # if there is a reminder, check to see how long.
+    else:
+        return render_template("dashboard.html", user=user)
     
 
 @app.route("/log_pain", methods=["GET", "POST"])
 @login_required
 def log_pain():
-    user = User.query.get(session["user_id"])
+    user = g.user
+    print(user)
+
     errors = {}
 
     if request.method == "POST":
+        reminder = Reminder.query.filter(Reminder.user_id == user.id).first()
+        today = date.today()
+
         pain_level = request.form.get("pain_level")
         pain_notes = request.form.get("pain_notes")
 
         if not pain_level:
             errors["pain_level"] = True
             return render_template("log_pain.html", user=user, errors=errors)
+        
+        # set the new last check in, if there is no reminder set, make one.
+        if not reminder:
+            reminder = Reminder(
+                user_id=user.id,
+                checkin_last=today
+            )
+            db.session.add(reminder)
+        else:
+            reminder.checkin_last = today
 
         pain_level = int(pain_level)
-        today = date.today()
 
         existing_log = PainLog.query.filter(
             PainLog.user_id == user.id,
@@ -130,7 +163,7 @@ def logout():
 @app.route("/pain_log", methods=["GET"])
 @login_required
 def pain_log():
-    user = User.query.get(session["user_id"])
+    user = g.user
     selected_range = request.args.get("range", "month")
     query = PainLog.query.filter_by(user_id=user.id)
     pain = query.order_by(PainLog.created_at.asc()).all()

@@ -24,9 +24,12 @@ class PainLog(db.Model):
     body_areas = db.Column(db.Text)  # JSON string for now
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-class Reminders(db.Model):
+
+class Reminder(db.Model):
+    __tablename__ = "reminders"
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    checkin_last = db.Column(db.DateTime)
-    checkin_weekly = db.Column(db.DateTime)
-    checkin_monthyl = db.Column(db.DateTime)
-    checkin_yearly = db.Column(db.DateTime)
+    checkin_last = db.Column(db.Date)
+    checkin_weekly = db.Column(db.Date)
+    checkin_monthly = db.Column(db.Date)
+    checkin_yearly = db.Column(db.Date)
