@@ -1,12 +1,25 @@
 {% extends "layout.html" %}
 
+{% block scripts %}
+    <script src="static/js/draw_pain.js"></script>
+{% endblock %}
+
 {% block title %}
     Dashboard
 {% endblock %}
 
-
 {% block main %}
     <form method="POST" action="/log_pain">
+        <div class="mb-4">
+            <label class="form-label">Draw Your Pain</label>
+
+            <div class="pain-canvas-wrapper">
+                <canvas id="painCanvas"></canvas>
+            </div>
+
+            <input type="hidden" name="drawing_data" id="drawing_data">
+            <input type="hidden" name="body_areas" id="body_areas">
+        </div>
         <div class="mb-3">
             <label for="pain_level" class="form-label">Current Pain Level</label>
             <div class="d-flex justify-content-between small text-muted">
