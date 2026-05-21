@@ -10,17 +10,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const ctx = canvas.getContext("2d");
 
     let isDrawing = false;
+    let lastPosition = null;
+
+    const brushRadius = 32;
+    const brushStrength = 0.08;
 
     function resizeCanvas() {
         const rect = canvas.getBoundingClientRect();
 
         canvas.width = rect.width;
         canvas.height = rect.height;
-
-        ctx.lineWidth = 28;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "rgba(220, 53, 69, 0.35)";
     }
 
     resizeCanvas();
@@ -46,15 +45,54 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
+    function drawAirbrushDot(x, y) {
+        const gradient = ctx.createRadialGradient(
+            x,
+            y,
+            0,
+            x,
+            y,
+            brushRadius
+        );
+
+        gradient.addColorStop(0, `rgba(220, 53, 69, ${brushStrength})`);
+        gradient.addColorStop(0.4, `rgba(220, 53, 69, ${brushStrength * 0.5})`);
+        gradient.addColorStop(1, "rgba(220, 53, 69, 0)");
+
+        ctx.fillStyle = gradient;
+
+        ctx.beginPath();
+        ctx.arc(x, y, brushRadius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawBetweenPoints(from, to) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const spacing = 4;
+        const steps = Math.max(Math.floor(distance / spacing), 1);
+
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+
+            const x = from.x + dx * t;
+            const y = from.y + dy * t;
+
+            drawAirbrushDot(x, y);
+        }
+    }
+
     function startDrawing(event) {
         event.preventDefault();
 
         isDrawing = true;
 
         const position = getPosition(event);
+        lastPosition = position;
 
-        ctx.beginPath();
-        ctx.moveTo(position.x, position.y);
+        drawAirbrushDot(position.x, position.y);
     }
 
     function draw(event) {
@@ -66,8 +104,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const position = getPosition(event);
 
-        ctx.lineTo(position.x, position.y);
-        ctx.stroke();
+        drawBetweenPoints(lastPosition, position);
+
+        lastPosition = position;
     }
 
     function stopDrawing(event) {
@@ -78,8 +117,9 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
 
         isDrawing = false;
+        lastPosition = null;
 
-        drawingInput.value = canvas.toDataURL("image/png");
+        drawingInput.value = canvas.toDataURL("image/jpeg", 0.5);
     }
 
     canvas.addEventListener("mousedown", startDrawing);

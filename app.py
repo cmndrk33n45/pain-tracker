@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_TYPE"] = "filesystem"
@@ -74,6 +75,7 @@ def log_pain():
 
         pain_level = request.form.get("pain_level")
         pain_notes = request.form.get("pain_notes")
+        drawing_data = request.form.get("drawing_data")
 
         if not pain_level:
             errors["pain_level"] = True
@@ -93,19 +95,19 @@ def log_pain():
 
         existing_log = PainLog.query.filter(
             PainLog.user_id == user.id,
-            db.extract("year", PainLog.created_at) == today.year,
-            db.extract("month", PainLog.created_at) == today.month,
-            db.extract("day", PainLog.created_at) == today.day
+
         ).first()
 
         if existing_log:
             existing_log.pain_level = pain_level
             existing_log.pain_notes = pain_notes
+            existing_log.drawing_data = drawing_data
         else:
             pain_log = PainLog(
                 user_id=user.id,
                 pain_level=pain_level,
-                pain_notes=pain_notes
+                pain_notes=pain_notes,
+                drawing_data=drawing_data
             )
             db.session.add(pain_log)
 

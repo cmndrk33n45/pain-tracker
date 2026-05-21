@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, date
 
 db = SQLAlchemy()
 
@@ -22,7 +22,8 @@ class PainLog(db.Model):
     pain_notes = db.Column(db.Text)
     body_view = db.Column(db.String(10))  # "front" or "back"
     body_areas = db.Column(db.Text)  # JSON string for now
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    drawing_data = db.Column(db.Text)
+    created_at = db.Column(db.Date, default=date.today)
 
 
 class Reminder(db.Model):
